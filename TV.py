@@ -22,7 +22,11 @@ newList = pd.DataFrame(columns = ['tvId'])
 
 idList = list(range(1,120001))
 def remId(i):
-    idList.remove(i)
+    print(i,"rem")
+    try:
+        idList.remove(i)
+    except Exception as e:
+        print("Error: ", str(e))
 data.apply(lambda row : remId(row['tvId']), axis = 1)
 
 with open(fileName, 'a', encoding="utf-8") as newFile:
