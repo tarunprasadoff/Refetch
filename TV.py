@@ -18,6 +18,8 @@ df.to_csv(fileName, index=False)
 watchName = date + '-TV-watch-html.csv'
 df.to_csv(watchName, index=False)
 
+newList = pd.DataFrame(columns = ['tvId'])
+
 idList = list(range(1,120001))
 def remId(i):
     idList.remove(i)
@@ -35,6 +37,8 @@ with open(fileName, 'a', encoding="utf-8") as newFile:
             uClient.close()
             print(str(i))
             df = df.append({'tvId': i, 'html': page_soup},
+                           ignore_index=True)
+            newList = newList.append({'tvId': i},
                            ignore_index=True)
             if j > 300:
                 j = 1
@@ -76,7 +80,7 @@ with open(fileName, 'a', encoding="utf-8") as newFile:
     df = pd.DataFrame(columns=['tvId', 'html'])
     print(f"Runtime of the program is {time.time() - start}")
 
-pd.read_csv(listName).append(pd.DataFrame(pd.read_csv(fileName)['tvId'], columns=["tvId"]),ignore_index=True).to_csv(listName, index=False)
+pd.read_csv(listName).append(newList,ignore_index=True).to_csv(listName, index=False)
 
 with open(watchName, 'a', encoding="utf-8") as newFile:
     newFileWriter = csv.writer(newFile)
