@@ -6,28 +6,28 @@ import csv
 from datetime import datetime
 
 date = str(datetime.date(datetime.now()))
-outName = date + '-Movie.csv'
+outName = date + '-TV.csv'
 
-# listName = 'Movie-List.csv'
-# data = pd.read_csv(listName)
+#listName = 'TV-List.csv'
+#data = pd.read_csv(listName)
 
-fileName = date + '-Movie-html.csv'
-df = pd.DataFrame(columns = ['movieId', 'html'])
+fileName = date + '-TV-html.csv'
+df = pd.DataFrame(columns = ['tvId', 'html'])
 df.to_csv(fileName, index=False)
 
-watchName = date + '-Movie-watch-html.csv'
+watchName = date + '-TV-watch-html.csv'
 df.to_csv(watchName, index=False)
 
-newList = pd.DataFrame(columns = ['movieId'])
+newList = pd.DataFrame(columns = ['tvId'])
 
-idList = list(range(1,850001))
+idList = list(range(1,120001))
 # def remId(i):
-#     print(i, "rem")
+#     print(i,"rem")
 #     try:
 #         idList.remove(i)
 #     except Exception as e:
 #         print("Error: ", str(e))
-# data.apply(lambda row : remId(row['movieId']), axis = 1)
+# data.apply(lambda row : remId(row['tvId']), axis = 1)
 
 with open(fileName, 'a', encoding="utf-8") as newFile:
     newFileWriter = csv.writer(newFile)
@@ -36,19 +36,19 @@ with open(fileName, 'a', encoding="utf-8") as newFile:
     for i in idList:
 
         try:
-            uClient = uReq("https://www.themoviedb.org/movie/" + str(i))
+            uClient = uReq("https://www.themoviedb.org/tv/" + str(i))
             page_soup = soup(uClient.read(), "html.parser")
             uClient.close()
             print(str(i))
-            df = df.append({'movieId': i, 'html': page_soup},
+            df = df.append({'tvId': i, 'html': page_soup},
                            ignore_index=True)
-            newList = newList.append({'movieId': i},
+            newList = newList.append({'tvId': i},
                            ignore_index=True)
             if j > 300:
                 j = 1
                 print("Writing to CSV")
                 newFileWriter.writerows(df.values)
-                df = pd.DataFrame(columns=['movieId', 'html'])
+                df = pd.DataFrame(columns=['tvId', 'html'])
             else:
                 j += 1
         except Exception as e:
@@ -81,29 +81,29 @@ with open(fileName, 'a', encoding="utf-8") as newFile:
             
     print("Writing to CSV")
     newFileWriter.writerows(df.values)
-    df = pd.DataFrame(columns=['movieId', 'html'])
+    df = pd.DataFrame(columns=['tvId', 'html'])
     print(f"Runtime of the program is {time.time() - start}")
 
-# pd.read_csv(listName).append(newList,ignore_index=True).to_csv(listName, index=False)
+#pd.read_csv(listName).append(newList,ignore_index=True).to_csv(listName, index=False)
 
 with open(watchName, 'a', encoding="utf-8") as newFile:
     newFileWriter = csv.writer(newFile)
     j = 1
     start = time.time()
-    for i in pd.read_csv(fileName)['movieId']:
+    for i in pd.read_csv(fileName)['tvId']:
 
         try:
-            uClient = uReq("https://www.themoviedb.org/movie/" + str(i) + "/watch")
+            uClient = uReq("https://www.themoviedb.org/tv/" + str(i) + "/watch")
             page_soup = soup(uClient.read(), "html.parser")
             uClient.close()
-            print(str(i) + "Watch")
-            df = df.append({'movieId': i, 'html': page_soup},
+            print(str(i) + 'Watch')
+            df = df.append({'tvId': i, 'html': page_soup},
                            ignore_index=True)
             if j > 300:
                 j = 1
                 print("Writing to CSV")
                 newFileWriter.writerows(df.values)
-                df = pd.DataFrame(columns=['movieId', 'html'])
+                df = pd.DataFrame(columns=['tvId', 'html'])
             else:
                 j += 1
         except Exception as e:
@@ -138,8 +138,8 @@ with open(watchName, 'a', encoding="utf-8") as newFile:
     newFileWriter.writerows(df.values)
     print(f"Runtime of the program is {time.time() - start}")
 
-data = pd.DataFrame(columns=['movieId', 'title', 'release', 'certification', 'userRating', 'tagline', 'synopsis',
-                             'genres', 'duration', 'thumbnailUrl', 'backdropUrl',  'Original Language', 'cast', 'crew', 'keywords', 'budget', 'revenue', 'trailerUrl', 'watch', 'isIndianOTT'])
+data = pd.DataFrame(columns=['tvId', 'title', 'release', 'userRating', 'synopsis',
+                             'genres', 'thumbnailUrl', 'Original Language', 'cast', 'trailerOrPromoUrl', 'isIndianOTT', 'backdropUrl', 'keywords', 'watch'])
 
 dfMain = pd.read_csv(fileName)
 dfWatch = pd.read_csv(watchName)
@@ -150,34 +150,24 @@ def handleEmptyGet(tag, getString):
     else:
         return None
 
-def handleEmptyCleanGetText(tag):
-    value = None
-    if(tag != None):
-        value =  tag.getText().replace("\n","").replace("\r","").replace(" ","")
-    return value
-
 for i in range(0, len(dfMain.index)):
 
     bs = soup(dfMain.loc[i].html, "html.parser")
-    movieId = dfMain.loc[i].movieId
-    
+    tvId = dfMain.loc[i].tvId
+
     container = bs.find("div", {"class": "title ott_false"})
     if(container == None):
         container = bs.find("div", {"class": "title ott_true"})
 
     title = container.find("h2").find("a").getText()
 
-    release = handleEmptyCleanGetText(bs.find("span", {"class": "release"}))
-
-    certification = handleEmptyCleanGetText(bs.find("span", {"class": "certification"}))
+    release = container.find("span").getText().replace(
+        "(", "").replace(")", "")
+    if(len(release) != 4):
+        release = None
 
     userRating = handleEmptyGet(
         bs.find("div", {"class": "user_score_chart"}), "data-percent")
-    
-    taglineFetch  = bs.find("h3", {"class":"tagline"})
-    tagline = None
-    if(taglineFetch!=None):
-        tagline = taglineFetch.getText()
 
     synopsis = bs.find("div", {"class": "overview"}).find("p").getText()
 
@@ -185,31 +175,14 @@ for i in range(0, len(dfMain.index)):
     for genreTag in bs.find("span", {"class": "genres"}).findAll("a"):
         genres.append(genreTag.getText())
 
-    duration = handleEmptyCleanGetText(bs.find("span", {"class": "runtime"}))
-
     thumbnailUrl = handleEmptyGet(
         bs.find("img", {"class": "poster lazyload"}), "data-src")
-    
-    backdropUrl = handleEmptyGet(bs.find("img", {"class": "backdrop"}), "data-src")
 
     section = bs.find("section", {"class": "facts"})
-
-    language = None
-    budget = None
-    revenue = None
-
-    if(section!=None):
-        language = section.find("bdi", string="Original Language").parent.parent.getText()
-        if(language != None):
-            language = language.replace("Original Language ", "")
-
-        budget = section.find("bdi", string="Budget").parent.parent.getText()
-        if(budget != None):
-            budget = budget.replace("Budget ", "")
-
-        revenue = section.find("bdi", string="Revenue").parent.parent.getText()
-        if(revenue != None):
-            revenue = revenue.replace("Revenue ", "")
+    language = section.find(
+        "bdi", string="Original Language").parent.parent.getText()
+    if(language != None):
+        language = language.replace("Original Language ", "")
 
     temp = bs.find("ol", {"class": "people scroller"})
     temp = bs.findAll("li", {"class": "card"})
@@ -221,26 +194,24 @@ for i in range(0, len(dfMain.index)):
         character = cur.find("p", {"class": "character"}).getText()
         cast.append(
             {"actor": actor, "actorImageUrl": actorImageUrl, "character": character})
-        
-    crew = []
-    for member in bs.find_all("li", {"class":"profile"}):
-        name = member.a.getText()
-        role = member.find("p", {"class":"character"}).getText()
-        crew.append({"name": name, "role": role})
-        
+
+    trailerUrlId = handleEmptyGet(
+        bs.find("a", {"class": "no_click play_trailer"}), "data-id")
+    trailerUrl = None
+    if(trailerUrlId != None):
+        trailerUrl = 'www.youtube.com/watch?v=' + str(trailerUrlId)
+
+    backdropUrl = handleEmptyGet(
+        bs.find("img", {"class": "backdrop"}), "data-src")
+
     keywordsFetch = bs.find("section", {"class": "keywords"})
     keywords = []
     if(keywordsFetch != None):
         for a in keywordsFetch.find_all("a"):
             keywords.append(a.getText())
 
-    trailerUrlId = handleEmptyGet(bs.find("a", {"class": "no_click play_trailer"}), "data-id")
-    trailerUrl = None
-    if(trailerUrlId != None):
-        trailerUrl = 'www.youtube.com/watch?v=' + trailerUrlId
-        
     isIndianOTT = False
-    watchCurr = dfWatch[dfWatch.movieId == movieId]
+    watchCurr = dfWatch[dfWatch.tvId == tvId]
     if(len(watchCurr) == 0):
         watchList = []
     else:
@@ -266,6 +237,7 @@ for i in range(0, len(dfMain.index)):
                         price = provider.find("span", {"class": "price"})
                         if price != None:
                             price = price.getText()
+                            print(price)
                         quality = provider.find(
                             "span", {"class": "presentation_type"})
                         if quality != None:
@@ -278,10 +250,10 @@ for i in range(0, len(dfMain.index)):
         else:
             watchList = []
 
-    data = data.append({'movieId': movieId, 'title': title, 'release': release, 'certification': certification, 'userRating': userRating, 'tagline': tagline, 'synopsis': synopsis,
-                        'genres': genres, 'duration': duration, 'thumbnailUrl': thumbnailUrl, 'backdropUrl': backdropUrl, 'Original Language': language, 'cast': cast, 'crew': crew, 'keywords': keywords, 'budget': budget, 'revenue': revenue, 'trailerUrl': trailerUrl, 'watch': watchList, 'isIndianOTT': isIndianOTT}, ignore_index=True)
+    data = data.append({'tvId': tvId, 'title': title, 'release': release, 'userRating': userRating, 'synopsis': synopsis,
+                        'genres': genres, 'thumbnailUrl': thumbnailUrl, 'Original Language': language, 'cast': cast, 'trailerOrPromoUrl': trailerUrl, 'isIndianOTT': isIndianOTT, 'backdropUrl': backdropUrl, 'keywords': keywords, 'watch': watchList}, ignore_index=True)
 
-    print(movieId, title)
+    print(tvId, title)
 
-writeName = date + "-Movie.csv"
+writeName = date + "-TV.csv"
 data.to_csv(writeName, index=False)
