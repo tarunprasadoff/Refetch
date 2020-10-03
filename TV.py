@@ -8,8 +8,8 @@ from datetime import datetime
 date = str(datetime.date(datetime.now()))
 outName = date + '-TV.csv'
 
-listName = 'TV-List.csv'
-data = pd.read_csv(listName)
+#listName = 'TV-List.csv'
+#data = pd.read_csv(listName)
 
 fileName = date + '-TV-html.csv'
 df = pd.DataFrame(columns = ['tvId', 'html'])
@@ -21,13 +21,13 @@ df.to_csv(watchName, index=False)
 newList = pd.DataFrame(columns = ['tvId'])
 
 idList = list(range(1,120001))
-def remId(i):
-    print(i,"rem")
-    try:
-        idList.remove(i)
-    except Exception as e:
-        print("Error: ", str(e))
-data.apply(lambda row : remId(row['tvId']), axis = 1)
+# def remId(i):
+#     print(i,"rem")
+#     try:
+#         idList.remove(i)
+#     except Exception as e:
+#         print("Error: ", str(e))
+# data.apply(lambda row : remId(row['tvId']), axis = 1)
 
 with open(fileName, 'a', encoding="utf-8") as newFile:
     newFileWriter = csv.writer(newFile)
@@ -84,7 +84,7 @@ with open(fileName, 'a', encoding="utf-8") as newFile:
     df = pd.DataFrame(columns=['tvId', 'html'])
     print(f"Runtime of the program is {time.time() - start}")
 
-pd.read_csv(listName).append(newList,ignore_index=True).to_csv(listName, index=False)
+#pd.read_csv(listName).append(newList,ignore_index=True).to_csv(listName, index=False)
 
 with open(watchName, 'a', encoding="utf-8") as newFile:
     newFileWriter = csv.writer(newFile)
