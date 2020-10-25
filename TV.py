@@ -8,7 +8,7 @@ from datetime import datetime
 date = str(datetime.date(datetime.now()))
 outName = date + '-TV.csv'
 
-idList = list(range(1, 125001))
+idList = list(range(1, 150001))
 
 
 def handleEmptyGet(tag, getString):
