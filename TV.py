@@ -213,3 +213,6 @@ with open(outName, 'a', encoding="utf-8") as newFile:
     print("Writing to CSV")
     newFileWriter.writerows(data.values)
     print(f"Runtime of the program is {time.time() - start}")
+
+import os
+os.system('aws s3 cp ./' + outName + 's3://rollinowscrape/')
