@@ -1,0 +1,10 @@
+#!/bin/bash
+apt-get update
+apt-get install python3-pip -y
+wget -qO- https://getpm2.com/install.sh | bash
+pip3 install bs4
+pip3 install pandas
+pip3 install tqdm
+git clone https://d0d8e8d8ec817a1e5c5c5ef9037625652f02b67c@github.com/tarunprasadoff/Refetch.git
+cd Refetch
+pm2 start Movie-1.py --interpreter python3 --no-autorestart

@@ -4,7 +4,7 @@ import pandas as pd
 import time
 import csv
 from datetime import datetime
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 
 date = str(datetime.date(datetime.now()))
 outName = date + '-People-6.csv'
