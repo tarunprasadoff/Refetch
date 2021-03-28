@@ -4,12 +4,12 @@ import pandas as pd
 import time
 import csv
 from datetime import datetime
+from tqdm import tqdm
 
 date = str(datetime.date(datetime.now()))
 outName = date + '-Movie-3.csv'
 
 idList = list(range(240001, 360001))
-
 
 def handleEmptyGet(tag, getString):
     if(tag != None):
@@ -25,7 +25,7 @@ def handleEmptyCleanGetText(tag):
     return value
 
 
-data = pd.DataFrame(columns=['movieId', 'title', 'release', 'certification', 'userRating', 'tagline', 'synopsis',
+data = pd.DataFrame(columns=['movieId', 'title', 'release', 'releaseCountry', 'certification', 'userRating', 'tagline', 'synopsis',
                              'genres', 'duration', 'thumbnailUrl', 'backdropUrl',  'Original Language', 'cast', 'crew', 'keywords', 'budget', 'revenue', 'trailerUrl', 'watch', 'isIndianOTT'])
 
 data.to_csv(outName, index=False)
@@ -34,7 +34,7 @@ with open(outName, 'a', encoding="utf-8") as newFile:
     newFileWriter = csv.writer(newFile)
     j = 1
     start = time.time()
-    for i in idList:
+    for i in tqdm(idList):
 
         try:
             uClient = uReq("https://www.themoviedb.org/movie/" + str(i))
@@ -53,6 +53,12 @@ with open(outName, 'a', encoding="utf-8") as newFile:
 
             release = handleEmptyCleanGetText(
                 bs.find("span", {"class": "release"}))
+            
+            releaseCountry = None
+            if not (release == None):
+                if ( ("(" in release) and (")" in release) ):
+                    releaseCountry = release.split("(")[1].replace(")","")
+                    release = release.split("(")[0]
 
             certification = handleEmptyCleanGetText(
                 bs.find("span", {"class": "certification"}))
@@ -173,16 +179,16 @@ with open(outName, 'a', encoding="utf-8") as newFile:
                     print("Watch Fetch Error")
                     watchList = []
 
-            data = data.append({'movieId': movieId, 'title': title, 'release': release, 'certification': certification, 'userRating': userRating, 'tagline': tagline, 'synopsis': synopsis,
+            data = data.append({'movieId': movieId, 'title': title, 'release': release, 'releaseCountry': releaseCountry, 'certification': certification, 'userRating': userRating, 'tagline': tagline, 'synopsis': synopsis,
                                 'genres': genres, 'duration': duration, 'thumbnailUrl': thumbnailUrl, 'backdropUrl': backdropUrl, 'Original Language': language, 'cast': cast, 'crew': crew, 'keywords': keywords, 'budget': budget, 'revenue': revenue, 'trailerUrl': trailerUrl, 'watch': watchList, 'isIndianOTT': isIndianOTT}, ignore_index=True)
 
-            print(movieId, title)
+            #print(movieId, title)
 
             if j > 300:
                 j = 1
                 print("Writing to CSV")
                 newFileWriter.writerows(data.values)
-                data = pd.DataFrame(columns=['movieId', 'title', 'release', 'certification', 'userRating', 'tagline', 'synopsis',
+                data = pd.DataFrame(columns=['movieId', 'title', 'release', 'releaseCountry', 'certification', 'userRating', 'tagline', 'synopsis',
                                              'genres', 'duration', 'thumbnailUrl', 'backdropUrl',  'Original Language', 'cast', 'crew', 'keywords', 'budget', 'revenue', 'trailerUrl', 'watch', 'isIndianOTT'])
 
             else:

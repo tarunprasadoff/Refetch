@@ -4,12 +4,12 @@ import pandas as pd
 import time
 import csv
 from datetime import datetime
+from tqdm import tqdm
 
 date = str(datetime.date(datetime.now()))
 outName = date + '-TV.csv'
 
 idList = list(range(1, 150001))
-
 
 def handleEmptyGet(tag, getString):
     if(tag != None):
@@ -17,9 +17,9 @@ def handleEmptyGet(tag, getString):
     else:
         return None
 
-
-data = pd.DataFrame(columns=['tvId', 'title', 'release', 'userRating', 'synopsis',
-                             'genres', 'thumbnailUrl', 'Original Language', 'cast', 'trailerOrPromoUrl', 'isIndianOTT', 'backdropUrl', 'keywords', 'watch'])
+data = pd.DataFrame(columns=['tvId', 'title', 'release', 'userRating', 'synopsis',\
+                             'genres', 'thumbnailUrl', 'Original Language', 'cast',\
+                             'trailerOrPromoUrl', 'isIndianOTT', 'backdropUrl', 'keywords', 'watch','seasonData'])
 
 data.to_csv(outName, index=False)
 
@@ -27,7 +27,7 @@ with open(outName, 'a', encoding="utf-8") as newFile:
     newFileWriter = csv.writer(newFile)
     j = 1
     start = time.time()
-    for i in idList:
+    for i in tqdm(idList):
 
         try:
             uClient = uReq("https://www.themoviedb.org/tv/" + str(i))
@@ -134,21 +134,54 @@ with open(outName, 'a', encoding="utf-8") as newFile:
                 except Exception as e2:
                     print("Watch Fetch Error")
                     watchList = []
+                    
+            seasonData = []
+            
+            try:
+                uClient2 = uReq("https://www.themoviedb.org/tv/" + str(i) + "/seasons")
+                bs2 = soup(uClient2.read(), "html.parser")
+                uClient2.close()
 
-            data = data.append({'tvId': tvId, 'title': title, 'release': release, 'userRating': userRating, 'synopsis': synopsis,
-                                'genres': genres, 'thumbnailUrl': thumbnailUrl, 'Original Language': language, 'cast': cast, 'trailerOrPromoUrl': trailerUrl, 'isIndianOTT': isIndianOTT, 'backdropUrl': backdropUrl, 'keywords': keywords, 'watch': watchList}, ignore_index=True)
+                seasons = bs2.find_all("div",{"class":"season"})
 
-            print(tvId, title)
+                for season in seasons:
+                    currSeason = {}
+                    currSeason["seasonName"] = season.find("h2").getText()
+                    currSeason["seasonYear"] = season.find("h4").getText().split("|")[0].replace(" ","")
+                    currSeason["episodeNo"] = int(season.find("h4").getText().split("|")[1].split()[0])
+                    currSeason["ps"] = season.findAll("p")
+                    if len(currSeason["ps"]) == 0:
+                        currSeason["seasonDesc"] = season.find("div",{"class":"season_overview"}).getText()
+                        currSeason["seasonReleaseSentence"] = None
+                    else:
+                        currSeason["seasonReleaseSentence"] = currSeason["ps"][0].getText()
+                        currSeason["seasonDesc"] = None
+                        if len(currSeason["ps"])>=2:
+                            currSeason["seasonDesc"] = currSeason["ps"][1].getText()
+                    currSeason["seasonImgUrl"] = handleEmptyGet(season.find("img"), "src")
+                    if not (currSeason["seasonImgUrl"] == None):
+                        currSeason["seasonImgUrl"] = 'themoviedb.org' + currSeason["seasonImgUrl"]
+                    seasonData.append(currSeason)
+            except Exception as ef:
+                print(f"Season Fetch Error at {i} : {str(ef)}")
+
+            data = data.append({'tvId': tvId, 'title': title, 'release': release, 'userRating': userRating, 'synopsis': synopsis,\
+                                'genres': genres, 'thumbnailUrl': thumbnailUrl, 'Original Language': language, 'cast': cast, 'trailerOrPromoUrl': trailerUrl,\
+                                'isIndianOTT': isIndianOTT, 'backdropUrl': backdropUrl, 'keywords': keywords,\
+                                'watch': watchList, 'seasonData': seasonData}, ignore_index=True)
+
+            #print(tvId, title)
 
             if j > 300:
                 j = 1
                 print("Writing to CSV")
                 newFileWriter.writerows(data.values)
                 data = pd.DataFrame(columns=['tvId', 'title', 'release', 'userRating', 'synopsis',
-                                             'genres', 'thumbnailUrl', 'Original Language', 'cast', 'trailerOrPromoUrl', 'isIndianOTT', 'backdropUrl', 'keywords', 'watch'])
+                                             'genres', 'thumbnailUrl', 'Original Language', 'cast', 'trailerOrPromoUrl', 'isIndianOTT', 'backdropUrl', 'keywords', 'watch','seasonData'])
 
             else:
                 j += 1
+                
         except Exception as e:
             eString = str(e)
 

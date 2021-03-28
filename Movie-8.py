@@ -7,9 +7,9 @@ from datetime import datetime
 from tqdm import tqdm
 
 date = str(datetime.date(datetime.now()))
-outName = date + '-Movie-4.csv'
+outName = date + '-Movie-8.csv'
 
-idList = list(range(360001, 480001))
+idList = list(range(840001, 960001))
 
 def handleEmptyGet(tag, getString):
     if(tag != None):
