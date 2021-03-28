@@ -46,6 +46,7 @@ with open(outName, 'a', encoding="utf-8") as newFile:
                 for p in aboutPs:
                     about.append(p.getText())
                     
+            imgUrl = None
             imgDivTag = bs.find("div",{"class":"image_content"})
             if not (imgDivTag == None):
                 imgTag = imgDivTag.find("img")
