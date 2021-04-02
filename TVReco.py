@@ -35,7 +35,7 @@ df = pd.DataFrame(columns=["tvId","Recommendations"]) if ( not ( os.path.exists(
 
 tvIds = [ide for ide in tvIds if ide not in [int(ida) for ida in list(df.tvId.values)]]
 
-cmd = f"aws s3 cp {outName} s3://rollinowscrape/"
+cmd = f"aws s3 cp {outName} s3://rnrecos/"
 
 for i in tqdm(tvIds):
     try:
