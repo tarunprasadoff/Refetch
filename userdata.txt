@@ -60,5 +60,5 @@ newgrp docker
 # sudo docker run -d {img_name}
 # docker update --restart=always {container_name}
 # sudo docker container start {container_name}
-# current container_name is dd6
+# tv : dd6, movie-1 : 99a, movie-2: ebe, movie-3: 833, movie-4: ab6, movie-5: fb7, movie-6: 837
 # chown `whoami` /mount
