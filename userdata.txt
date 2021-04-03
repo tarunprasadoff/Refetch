@@ -20,7 +20,7 @@ mkdir /var/lib/docker
 export AWS_INSTANCE_ID=$(./ec2-metadata -i | grep "instance-id:" | cut -d' ' -f2)
 export DEVICE_POSTFIX=xvdf
 export DEVICE=/dev/$DEVICE_POSTFIX
-export REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
+export REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')"
 aws ec2  attach-volume --volume-id $VOLUME_ID --device $DEVICE --instance-id $AWS_INSTANCE_ID --region $REGION
 ATTACHMENT_STATE="unknown"
 until [ "${ATTACHMENT_STATE}" == "attached" ]; do
@@ -61,4 +61,9 @@ newgrp docker
 # docker update --restart=always {container_name}
 # sudo docker container start {container_name}
 # tv : dd6, movie-1 : 99a, movie-2: ebe, movie-3: 833, movie-4: ab6, movie-5: fb7, movie-6: 837
+# persons: 1: 5f5, 2: ea3, 3: c59, 4: 61a, 5: bfd,
+# 6: 106, 7: c90, 8: 059, 9: 1ba, 10: 38d,
+# 11: 2e6, 12: efc, 13: 20f, 14: d6a, 15: a7a,
+# 16: f40, 17: 03b, 18: 637, 19: 294, 20: 66c
 # chown `whoami` /mount
+# ["dd6", "99a", "ebe", "833", "ab6", "fb7", "837", "5f5", "ea3", "c59", "61a", "bfd", "106", "c90", "059", "1ba", "38d", "2e6", "efc", "20f", "d6a", "a7a", "f40", "03b", "637", "294", "66c"]

@@ -42,8 +42,11 @@ df = pd.DataFrame(columns=["movieId","Recommendations"]) if ( not ( os.path.exis
 movieIds = [ide for ide in movieIds if ide not in [int(ida) for ida in list(df.movieId.values)]]
 
 cmd = f"aws s3 cp {outName} s3://rollinowscrape/"
-
+j = 0
 for i in tqdm(movieIds):
+    j += 1
+    if ( (j%5000) == 0 ):
+        df.to_csv(outName,index=False)
     try:
         if ( type(i)  in [np.int, np.int0, np.int16, np.int32, np.int64, np.int8, np.intc, np.integer, type(1)] ):
             recos = []
