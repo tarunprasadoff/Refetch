@@ -60,4 +60,5 @@ newgrp docker
 # sudo docker run -d {img_name}
 # docker update --restart=always {container_name}
 # sudo docker container start {container_name}
-# current container_name is 591
+# current container_name is dd6
+# chown `whoami` /mount

@@ -1,0 +1,60 @@
+FROM ubuntu:latest
+ENV DEBIAN_FRONTEND=noninteractive
+ENV NODE_ENV=production
+
+RUN apt-get update
+
+# Install curl
+RUN apt-get install curl -y
+
+# Install git
+RUN apt install -y git
+
+# Install nano
+RUN apt-get install vim nano -y
+
+# Install Chrome for Selenium
+RUN curl https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /chrome.deb
+RUN dpkg -i /chrome.deb || apt-get install -yf
+RUN rm /chrome.deb
+
+# Install chromedriver for Selenium
+RUN wget https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip
+RUN apt-get install unzip
+RUN unzip chromedriver_linux64.zip
+RUN mv chromedriver /usr/bin/chromedriver
+RUN chown root:root /usr/bin/chromedriver
+RUN chmod +x /usr/bin/chromedriver
+
+# Install python
+RUN apt-get install python3 -y
+
+# Install pip
+RUN apt install python3-pip -y
+
+# Install python dependencies required
+RUN pip3 install \
+    numpy \
+    pandas \
+    selenium \
+    service_identity \
+    tqdm \
+    awscli
+
+# change timezone
+RUN echo "Asia/Kolkata" > /etc/timezone
+RUN rm -f /etc/localtime
+RUN dpkg-reconfigure -f noninteractive tzdata
+
+RUN git clone https://d0d8e8d8ec817a1e5c5c5ef9037625652f02b67c@github.com/tarunprasadoff/Refetch.git
+
+# Change working directory
+WORKDIR /Refetch
+
+EXPOSE 4444
+
+# Create a volume
+VOLUME /Refetch
+
+#Keep it running
+CMD git pull origin master && python3 -u MovieReco-5.py
