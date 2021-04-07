@@ -20,7 +20,7 @@ mkdir /var/lib/docker
 export AWS_INSTANCE_ID=$(./ec2-metadata -i | grep "instance-id:" | cut -d' ' -f2)
 export DEVICE_POSTFIX=xvdf
 export DEVICE=/dev/$DEVICE_POSTFIX
-export REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')"
+export REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/[a-z]$//')
 aws ec2  attach-volume --volume-id $VOLUME_ID --device $DEVICE --instance-id $AWS_INSTANCE_ID --region $REGION
 ATTACHMENT_STATE="unknown"
 until [ "${ATTACHMENT_STATE}" == "attached" ]; do
@@ -67,3 +67,59 @@ newgrp docker
 # 16: f40, 17: 03b, 18: 637, 19: 294, 20: 66c
 # chown `whoami` /mount
 # ["dd6", "99a", "ebe", "833", "ab6", "fb7", "837", "5f5", "ea3", "c59", "61a", "bfd", "106", "c90", "059", "1ba", "38d", "2e6", "efc", "20f", "d6a", "a7a", "f40", "03b", "637", "294", "66c"]
+
+# docker container start dd6
+# docker container start 99a
+# docker container start ebe
+# docker container start 833
+# docker container start ab6
+# docker container start fb7
+# docker container start 837
+# docker container start 5f5
+# docker container start ea3
+# docker container start c59
+# docker container start 61a
+# docker container start bfd
+# docker container start 106
+# docker container start c90
+# docker container start 059
+# docker container start 1ba
+# docker container start 38d
+# docker container start 2e6
+# docker container start efc
+# docker container start 20f
+# docker container start d6a
+# docker container start a7a
+# docker container start f40
+# docker container start 03b
+# docker container start 637
+# docker container start 294
+# docker container start 66c
+
+# docker container stop dd6
+# docker container stop 99a
+# docker container stop ebe
+# docker container stop 833
+# docker container stop ab6
+# docker container stop fb7
+# docker container stop 837
+# docker container stop 5f5
+# docker container stop ea3
+# docker container stop c59
+# docker container stop 61a
+# docker container stop bfd
+# docker container stop 106
+# docker container stop c90
+# docker container stop 059
+# docker container stop 1ba
+# docker container stop 38d
+# docker container stop 2e6
+# docker container stop efc
+# docker container stop 20f
+# docker container stop d6a
+# docker container stop a7a
+# docker container stop f40
+# docker container stop 03b
+# docker container stop 637
+# docker container stop 294
+# docker container stop 66c

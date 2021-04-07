@@ -41,7 +41,7 @@ df = pd.DataFrame(columns=["movieId","Recommendations"]) if ( not ( os.path.exis
 
 movieIds = [ide for ide in movieIds if ide not in [int(ida) for ida in list(df.movieId.values)]]
 
-cmd = f"aws s3 cp {outName} s3://rollinowscrape/"
+cmd = f"aws s3 cp {outName} s3://rnrecos/"
 j = 0
 for i in tqdm(movieIds):
     j += 1
